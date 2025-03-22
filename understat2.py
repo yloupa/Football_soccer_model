@@ -4,6 +4,12 @@ import requests
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+import os
+from typing import Sequence
+
+load_dotenv()
+
 
 
 def get_matches_data(url: str) -> pd.DataFrame:
@@ -20,6 +26,20 @@ def get_matches_data(url: str) -> pd.DataFrame:
     matches_data = get_json_data(script=scripts[2])  #see understattest to see how to find it's third script
 
     return matches_data
+
+def get_matches_data_multi_seasons(
+    url: str, seasons: Sequence[int]=list(range(2014, 2025, 1))
+) -> pd.DataFrame:
+    all_data = []
+    for season in seasons:
+        season_url = f"{url}/{season}"
+        season_matches_data = get_matches_data(url=season_url)
+
+        all_data.append(season_matches_data)
+
+    all_data = pd.concat(all_data, axis=0)
+
+    return all_data.reset_index(drop=True)
 
 
 def get_json_data(script) -> pd.DataFrame:
@@ -41,7 +61,7 @@ def get_json_data(script) -> pd.DataFrame:
 
 # Example URL (you can replace with the desired championship page)
 url = "https://understat.com/league/EPL"
-matches = get_matches_data(url=url)
+matches = get_matches_data_multi_seasons(url=url)
 
 # Show the first few rows of the matches data
 print(matches.head())
