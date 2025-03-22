@@ -17,7 +17,7 @@ def get_matches_data(url: str) -> pd.DataFrame:
     soup_page = BeautifulSoup(page_tree.content, "lxml")  # Use 'html.parser' instead of 'lxml'
     scripts = soup_page.find_all("script")
 
-    matches_data = get_json_data(script=scripts[2])
+    matches_data = get_json_data(script=scripts[2])  #see understattest to see how to find it's third script
 
     return matches_data
 
@@ -25,7 +25,7 @@ def get_matches_data(url: str) -> pd.DataFrame:
 def get_json_data(script) -> pd.DataFrame:
     s_string = script.string
 
-    ind_start = s_string.index("('") + 2
+    ind_start = s_string.index("('") + 2 #see understat test for beginning of json to see why +2
     ind_end = s_string.index("')")
 
     j_data = s_string[ind_start:ind_end]
