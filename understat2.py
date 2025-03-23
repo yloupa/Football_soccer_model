@@ -23,10 +23,14 @@ def get_matches_data(url: str) -> pd.DataFrame:
 
     matches_data = get_json_data(script=scripts[2])  #see understattest to see how to find it's third script
 
+    league, season = url.split("/")[-2:]
+    matches_data["league"] = league
+    matches_data["season"] = f"{int(season)}-{int(season)+1}"
+
     return matches_data
 
 def get_matches_data_multi_seasons(
-    url: str, seasons: Sequence[int]=list(range(2014, 2026, 1))
+    url: str, seasons: Sequence[int]=list(range(2014, 2025, 1)) #make sure range is only to 2025, 2024 and 2025 url return the same data creating duplicates
 ) -> pd.DataFrame:
     all_data = []
     for season in seasons:
@@ -68,7 +72,10 @@ matches = get_matches_data_multi_seasons(url=url)
 
 
 # Show the first few rows of the matches data
+pd.set_option('display.max_columns', None)
 print(matches.head())
+
+pd.reset_option('display.max_columns')
 
 # Create a list to hold all expanded records
 all_records = []
@@ -77,6 +84,8 @@ all_records = []
 for _, team_row in matches.iterrows():
     team_id = team_row['id']
     team_title = team_row['title']
+    team_league = team_row['league']
+    team_season = team_row['season']
 
     # For each history entry of this team, create a complete record
     for history_entry in team_row['history']:
@@ -89,7 +98,9 @@ for _, team_row in matches.iterrows():
         # Create a new record with team info and history data
         complete_record = {
             'id': team_id,
-            'title': team_title
+            'title': team_title,
+            'league': team_league,
+            'season': team_season
         }
         # Add all history fields to the record
         complete_record.update(history_dict)
