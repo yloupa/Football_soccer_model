@@ -31,3 +31,6 @@ if third_script.string:
     print(s_string[:100])  # Print the entire string to inspect its content
 else:
     print("No content in this script tag")
+
+for year in range(2014, 2026):
+        print(year)
