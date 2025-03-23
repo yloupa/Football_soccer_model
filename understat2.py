@@ -4,11 +4,9 @@ import requests
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
-import os
 from typing import Sequence
+import time
 
-load_dotenv()
 
 
 
@@ -20,7 +18,7 @@ def get_matches_data(url: str) -> pd.DataFrame:
         url: URL to the championship understat page
     """
     page_tree = requests.get(url)
-    soup_page = BeautifulSoup(page_tree.content, "lxml")  # Use 'html.parser' instead of 'lxml'
+    soup_page = BeautifulSoup(page_tree.content, "lxml")
     scripts = soup_page.find_all("script")
 
     matches_data = get_json_data(script=scripts[2])  #see understattest to see how to find it's third script
@@ -28,7 +26,7 @@ def get_matches_data(url: str) -> pd.DataFrame:
     return matches_data
 
 def get_matches_data_multi_seasons(
-    url: str, seasons: Sequence[int]=list(range(2014, 2025, 1))
+    url: str, seasons: Sequence[int]=list(range(2014, 2026, 1))
 ) -> pd.DataFrame:
     all_data = []
     for season in seasons:
@@ -36,6 +34,8 @@ def get_matches_data_multi_seasons(
         season_matches_data = get_matches_data(url=season_url)
 
         all_data.append(season_matches_data)
+
+        time.sleep(1) #in case of limiting
 
     all_data = pd.concat(all_data, axis=0)
 
@@ -62,6 +62,10 @@ def get_json_data(script) -> pd.DataFrame:
 # Example URL (you can replace with the desired championship page)
 url = "https://understat.com/league/EPL"
 matches = get_matches_data_multi_seasons(url=url)
+
+# if you only want to get the current season use below
+# matches=get_matches_data(url=url)
+
 
 # Show the first few rows of the matches data
 print(matches.head())
