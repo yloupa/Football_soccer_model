@@ -18,6 +18,22 @@ print(f"Number of duplicate rows: {duplicate_count}")
 df['Diff_act_xG']= df['xG'] - df['scored'] #create difference between xG and scored for the team in title
 df['Diff_act_xGA'] = df['xGA'] - df['missed'] #create difference between xG and scored for the opposition
 
+#fixing PPDA - the dict converted to strings by saving to csv
+df['ppda'] = df['ppda'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+df['ppda_allowed'] = df['ppda_allowed'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+df['ppda_att'] = df.ppda.apply(lambda x: x['att'])
+df['ppda_def'] = df.ppda.apply(lambda x: x['def'])
+df['ppda_att_ad'] = df.ppda_allowed.apply(lambda x: x['att'])
+df['ppda_def_ad'] = df.ppda_allowed.apply(lambda x: x['def'])
+df['ppda_cal'] = (df['ppda_att'] /
+                           df['ppda_def'].replace(0, np.nan)).fillna(0)
+
+df['ppda_cal_ad'] = (df['ppda_att_ad'] /
+                           df['ppda_def_ad'].replace(0, np.nan)).fillna(0)
+
+
+
+
 df_home = df[df['h_a']=='h'] #gets home games
 df_away = df[df['h_a']=='a'] #gets away games
 
@@ -47,21 +63,7 @@ print(df_compressed.dtypes)
 print('PPDA checking:')
 print(df_compressed['ppda'].head())
 print(df_compressed['ppda'].dtype)
-print(df_compressed[~df_compressed['ppda'].apply(lambda x: isinstance(x, dict))])
-
-
-#fixing PPDA - the dict converted to strings by saving to csv
-df_compressed['ppda'] = df_compressed['ppda'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-df_compressed['ppda_allowed'] = df_compressed['ppda_allowed'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-df_compressed['ppda_att_h'] = df_compressed.ppda.apply(lambda x: x['att'])
-df_compressed['ppda_def_h'] = df_compressed.ppda.apply(lambda x: x['def'])
-df_compressed['ppda_att_a'] = df_compressed.ppda_allowed.apply(lambda x: x['att'])
-df_compressed['ppda_def_a'] = df_compressed.ppda_allowed.apply(lambda x: x['def'])
-df_compressed['ppda_h'] = (df_compressed['ppda_att_h'] /
-                           df_compressed['ppda_def_h'].replace(0, np.nan)).fillna(0)
-
-df_compressed['ppda_a'] = (df_compressed['ppda_att_a'] /
-                           df_compressed['ppda_def_a'].replace(0, np.nan)).fillna(0)
+# print(df_compressed[~df_compressed['ppda'].apply(lambda x: isinstance(x, dict))])
 
 
 
