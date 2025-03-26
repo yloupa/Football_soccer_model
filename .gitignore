@@ -5,3 +5,6 @@
 .idea
 .env
 matches_expanded.csv
+av_ars.csv
+av_test.csv
+dup_test.csv
